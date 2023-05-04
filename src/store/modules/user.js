@@ -1,6 +1,7 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, profile } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
+import crypto from 'crypto'
 
 const state = {
   token: getToken(),
@@ -31,11 +32,14 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { email, password } = userInfo
+    const hash = crypto.createHash('md5')
+    hash.update(password)
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ email: email.trim(), password: hash.digest('hex') }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
+        console.log('response', data)
+        commit('SET_TOKEN', data.access_token)
         setToken(data.token)
         resolve()
       }).catch(error => {
@@ -45,9 +49,9 @@ const actions = {
   },
 
   // get user info
-  getInfo({ commit, state }) {
+  profile({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      profile().then(response => {
         const { data } = response
 
         if (!data) {
@@ -58,7 +62,7 @@ const actions = {
 
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
-          reject('getInfo: roles must be a non-null array!')
+          reject('profile: roles must be a non-null array!')
         }
 
         commit('SET_ROLES', roles)
@@ -109,7 +113,7 @@ const actions = {
     commit('SET_TOKEN', token)
     setToken(token)
 
-    const { roles } = await dispatch('getInfo')
+    const { roles } = await dispatch('profile')
 
     resetRouter()
 
