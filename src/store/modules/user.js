@@ -4,7 +4,8 @@ import router, { resetRouter } from '@/router'
 import crypto from 'crypto'
 
 const state = {
-  token: getToken(),
+  accessToken: getToken('ACCESS_TOKEN'),
+  refreshToken: getToken('REFRESH_TOKEN'),
   name: '',
   avatar: '',
   introduction: '',
@@ -12,8 +13,11 @@ const state = {
 }
 
 const mutations = {
-  SET_TOKEN: (state, token) => {
-    state.token = token
+  SET_ACCESS_TOKEN: (state, token) => {
+    state.accessToken = token
+  },
+  SET_REFRESH_TOKEN: (state, token) => {
+    state.refreshToken = token
   },
   SET_INTRODUCTION: (state, introduction) => {
     state.introduction = introduction
@@ -38,9 +42,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ email: email.trim(), password: hash.digest('hex') }).then(response => {
         const { data } = response
-        console.log('response', data)
-        commit('SET_TOKEN', data.access_token)
-        setToken(data.token)
+        commit('SET_ACCESS_TOKEN', data.access_token)
+        commit('SET_REFRESH_TOKEN', data.refresh_token)
+        setToken('ACCESS_TOKEN', data.access_token)
+        setToken('REFRESH_TOKEN', data.refresh_token)
         resolve()
       }).catch(error => {
         reject(error)
@@ -80,7 +85,8 @@ const actions = {
   logout({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
-        commit('SET_TOKEN', '')
+        // commit('SET_ACCESS_TOKEN', '')
+        // commit('SET_REFRESH_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()
         resetRouter()
@@ -99,7 +105,8 @@ const actions = {
   // remove token
   resetToken({ commit }) {
     return new Promise(resolve => {
-      commit('SET_TOKEN', '')
+      // commit('SET_ACCESS_TOKEN', '')
+      // commit('SET_REFRESH_TOKEN', '')
       commit('SET_ROLES', [])
       removeToken()
       resolve()
@@ -110,7 +117,7 @@ const actions = {
   async changeRoles({ commit, dispatch }, role) {
     const token = role + '-token'
 
-    commit('SET_TOKEN', token)
+    commit('SET_ACCESS_TOKEN', token)
     setToken(token)
 
     const { roles } = await dispatch('profile')
