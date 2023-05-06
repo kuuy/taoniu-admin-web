@@ -6,6 +6,7 @@ import crypto from 'crypto'
 const state = {
   accessToken: getToken('ACCESS_TOKEN'),
   refreshToken: getToken('REFRESH_TOKEN'),
+  refreshAt: getToken('REFRESH_AT'),
   name: '',
   avatar: '',
   introduction: '',
@@ -18,6 +19,9 @@ const mutations = {
   },
   SET_REFRESH_TOKEN: (state, token) => {
     state.refreshToken = token
+  },
+  SET_REFRESH_AT: (state, timestamp) => {
+    state.refreshAt = timestamp
   },
   SET_INTRODUCTION: (state, introduction) => {
     state.introduction = introduction
@@ -42,10 +46,13 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ email: email.trim(), password: hash.digest('hex') }).then(response => {
         const { data } = response
+        const timestamp = Date.now() + 895000
         commit('SET_ACCESS_TOKEN', data.access_token)
         commit('SET_REFRESH_TOKEN', data.refresh_token)
+        commit('SET_REFRESH_AT', timestamp)
         setToken('ACCESS_TOKEN', data.access_token)
         setToken('REFRESH_TOKEN', data.refresh_token)
+        setToken('REFRESH_AT', timestamp)
         resolve()
       }).catch(error => {
         reject(error)

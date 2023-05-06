@@ -21,6 +21,16 @@ router.beforeEach(async(to, from, next) => {
   const hasToken = getToken('ACCESS_TOKEN')
 
   if (hasToken) {
+    const refreshedAt = Number(getToken('REFRESHED_AT'))
+    const timestamp = Date.now()
+    if (timestamp > refreshedAt) {
+      await store.dispatch('token/refresh', store.getters.refreshToken)
+        .then(() => {
+        })
+        .catch(error => {
+          console.log('big problems: ', error)
+        })
+    }
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })

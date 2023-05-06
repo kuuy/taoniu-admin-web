@@ -11,3 +11,9 @@ export function removeToken() {
   // window.localStorage.setItem('ACCESS_TOKEN', '')
   // window.localStorage.setItem('REFRESH_TOKEN', '')
 }
+
+export function clearToken() {
+  window.localStorage.setItem('ACCESS_TOKEN', '')
+  window.localStorage.setItem('REFRESH_TOKEN', '')
+  window.localStorage.setItem('REFRESH_AT', '')
+}

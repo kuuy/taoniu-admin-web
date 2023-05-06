@@ -1,8 +1,6 @@
-import Layout from '@/layout'
-
 const tradingsRouter = {
   path: 'tradings',
-  component: Layout,
+  component: () => import('@/views/empty'),
   redirect: 'noRedirect',
   name: 'Tradings',
   meta: {

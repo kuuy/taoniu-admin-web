@@ -1,10 +1,8 @@
-import Layout from '@/layout'
-
 import tradingsRouter from './analysis/tradings'
 
 const analysisRouter = {
   path: 'analysis',
-  component: Layout,
+  component: () => import('@/views/empty'),
   redirect: 'noRedirect',
   name: 'Analysis',
   meta: {
