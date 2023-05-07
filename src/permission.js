@@ -21,10 +21,10 @@ router.beforeEach(async(to, from, next) => {
   const hasToken = getToken('ACCESS_TOKEN')
 
   if (hasToken) {
-    const refreshedAt = Number(getToken('REFRESHED_AT'))
+    const refreshedAt = Number(getToken('REFRESH_AT'))
     const timestamp = Date.now()
     if (timestamp > refreshedAt) {
-      await store.dispatch('token/refresh', store.getters.refreshToken)
+      await store.dispatch('user/refresh', store.getters.refreshToken)
         .then(() => {
         })
         .catch(error => {

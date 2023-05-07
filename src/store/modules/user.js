@@ -1,4 +1,5 @@
 import { login, logout, profile } from '@/api/user'
+import { refresh } from '@/api/token'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 import crypto from 'crypto'
@@ -103,6 +104,22 @@ const actions = {
         dispatch('tagsView/delAllViews', null, { root: true })
 
         resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  refresh({ commit }, refreshToken) {
+    return new Promise((resolve, reject) => {
+      refresh({ refresh_token: refreshToken }).then(response => {
+        const { data } = response
+        const timestamp = Date.now() + 895000
+        commit('SET_ACCESS_TOKEN', data.access_token)
+        commit('SET_REFRESH_AT', timestamp)
+        setToken('ACCESS_TOKEN', data.access_token)
+        setToken('REFRESH_AT', timestamp)
+        resolve(data.access_token)
       }).catch(error => {
         reject(error)
       })
