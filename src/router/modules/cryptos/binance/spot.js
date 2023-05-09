@@ -1,5 +1,7 @@
+import marketsRouter from './spot/markets'
 import analysisRouter from './spot/analysis'
 import tradingsRouter from './spot/tradings'
+import isolatedRouter from './spot/margin/isolated'
 
 const spotRouter = {
   path: 'spot',
@@ -10,8 +12,10 @@ const spotRouter = {
     title: '现货'
   },
   children: [
+    marketsRouter,
     analysisRouter,
-    tradingsRouter
+    tradingsRouter,
+    isolatedRouter
   ]
 }
 

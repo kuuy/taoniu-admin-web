@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { pagenate } from '@/api/cryptos/binance/spot/tradings/fishers/grids'
+import { pagenate } from '@/api/cryptos/binance/spot/margin/isolated/tradings/fishers/grids'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -74,6 +74,7 @@ export default {
   directives: { waves },
   filters: {
     statusFilter(status) {
+      const statusOptions = ['待买入', '已买入', '待卖出', '已完成']
       return statusOptions[status] || ''
     }
   },

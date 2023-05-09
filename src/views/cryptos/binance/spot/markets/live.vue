@@ -2,9 +2,6 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="query.symbol" placeholder="Symbol" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="query.status" multiple class="filter-item" style="width: 350px;" placeholder="请选择">
-        <el-option v-for="(item,index) in statusOptions" :key="index" :label="item" :value="index" />
-      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
@@ -19,39 +16,44 @@
       highlight-current-row
       style="width: 100%;"
     >
-      <el-table-column label="自动编号" width="200" align="center">
-        <template v-slot="{row}">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="市场代码" width="300" align="center">
+      <el-table-column label="市场代码" width="200" align="center">
         <template v-slot="{row}">
           <span>{{ row.symbol }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="买入" header-align="center" align="right">
+      <el-table-column label="开盘" width="200" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.buy_price }} × {{ row.buy_quantity }}</span>
+          <span>{{ row.open }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="卖出" header-align="center" align="right">
+      <el-table-column label="价格" width="200" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.sell_price }} × {{ row.sell_quantity }}</span>
+          <span>{{ row.price }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" width="200" align="center">
+      <el-table-column label="最高" width="200" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.high }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="更新时间" width="200" align="center">
+      <el-table-column label="最低" width="200" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.updated_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.low }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" class-name="status-col" align="center" width="100">
+      <el-table-column label="成交量" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.status | statusFilter }}</span>
+          <span>{{ row.volume }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="成交额" header-align="center" align="right">
+        <template v-slot="{row}">
+          <span>{{ row.quota }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="刷新时间" width="200" align="center">
+        <template v-slot="{row}">
+          <span>{{ row.timestamp | parseTime() }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -61,34 +63,27 @@
 </template>
 
 <script>
-import { pagenate } from '@/api/cryptos/binance/spot/tradings/fishers/grids'
+import { live } from '@/api/cryptos/binance/spot/markets'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
-const statusOptions = ['待买入', '已买入', '待卖出', '已完成']
-
 export default {
-  name: 'Grids',
+  name: 'Live',
   components: { Pagination },
   directives: { waves },
   filters: {
-    statusFilter(status) {
-      return statusOptions[status] || ''
-    }
   },
   data() {
     return {
       tableKey: 0,
       query: {
         symbol: '',
-        status: [],
         current: 1,
-        page_size: 20
+        pageSize: 20
       },
       total: 0,
       data: [],
-      statusOptions,
       isLoading: true,
       showReviewer: false,
       dialogFormVisible: false,
@@ -103,7 +98,7 @@ export default {
   methods: {
     pagenate() {
       this.isLoading = true
-      pagenate(this.query).then(response => {
+      live(this.query).then(response => {
         this.data = response.data
         this.total = response.total
 
@@ -118,7 +113,7 @@ export default {
     },
     formatJson(filterVal) {
       return this.list.map(v => filterVal.map(j => {
-        if (j === 'created_at' || j === 'updated_at') {
+        if (j === 'timestamp') {
           return parseTime(v[j])
         } else {
           return v[j]

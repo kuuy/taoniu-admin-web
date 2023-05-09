@@ -1,4 +1,4 @@
-import { pagenate } from '@/api/cryptos/binance/spot/tradings/fishers/grids'
+import { pagenate } from '@/api/cryptos/binance/spot/margin/isolated/tradings/fishers/grids'
 
 const state = {
 }
