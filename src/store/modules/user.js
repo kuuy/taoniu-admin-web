@@ -156,6 +156,8 @@ const actions = {
     // reset visited views and cached views
     dispatch('tagsView/delAllViews', null, { root: true })
   }
+
+
 }
 
 export default {
