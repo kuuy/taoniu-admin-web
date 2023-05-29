@@ -1,4 +1,5 @@
 import marketsRouter from './spot/markets'
+import indicatorsRouter from './spot/indicators'
 import analysisRouter from './spot/analysis'
 import tradingsRouter from './spot/tradings'
 import isolatedRouter from './spot/margin/isolated'
@@ -13,6 +14,7 @@ const spotRouter = {
   },
   children: [
     marketsRouter,
+    indicatorsRouter,
     analysisRouter,
     tradingsRouter,
     isolatedRouter

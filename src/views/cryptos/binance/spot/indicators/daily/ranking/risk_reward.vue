@@ -18,42 +18,52 @@
     >
       <el-table-column label="市场代码" width="200" align="center">
         <template v-slot="{row}">
-          <span>{{ row.symbol }}</span>
+          <span>{{ row[0] }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="开盘" width="200" header-align="center" align="right">
+      <el-table-column label="s3" width="150" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.open }}</span>
+          <span>{{ row[1] }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="价格" width="200" header-align="center" align="right">
+      <el-table-column label="s2" width="150" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.price }}</span>
+          <span>{{ row[2] }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="最高" width="200" header-align="center" align="right">
+      <el-table-column label="s1" width="150" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.high }}</span>
+          <span>{{ row[3] }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="最低" width="200" header-align="center" align="right">
+      <el-table-column label="r1" width="150" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.low }}</span>
+          <span>{{ row[4] }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="成交量" header-align="center" align="right">
+      <el-table-column label="r2" width="150" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.volume }}</span>
+          <span>{{ row[5] }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="成交额" header-align="center" align="right">
+      <el-table-column label="r3" width="150" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.quota }}</span>
+          <span>{{ row[6] }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="刷新时间" width="200" align="center">
+      <el-table-column label="盈利目标" header-align="center" align="right">
         <template v-slot="{row}">
-          <span>{{ row.timestamp | parseTime() }}</span>
+          <span>{{ row[7] }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="止损点" header-align="center" align="right">
+        <template v-slot="{row}">
+          <span>{{ row[8] }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="风险收益比" width="150" header-align="center" align="right">
+        <template v-slot="{row}">
+          <span>{{ row[9] }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -63,13 +73,13 @@
 </template>
 
 <script>
-import { live } from '@/api/cryptos/binance/spot/markets'
+import { pagenate } from '@/api/cryptos/binance/spot/indicators/daily/ranking'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
-  name: 'Live',
+  name: 'RiskReward',
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -79,6 +89,8 @@ export default {
       tableKey: 0,
       query: {
         symbol: '',
+        fields: 's3,s2,s1,r1,r2,r3,profit_target,stop_loss_point,risk_reward_ratio',
+        sort: 'risk_reward_ratio,-1',
         current: 1,
         page_size: 20
       },
@@ -98,8 +110,14 @@ export default {
   methods: {
     pagenate() {
       this.isLoading = true
-      live(this.query).then(response => {
-        this.data = response.data
+      pagenate(this.query).then(response => {
+        const that = this
+        that.data = []
+        if (response.data != null) {
+          response.data.forEach(function(row) {
+            that.data.push(row.split(','))
+          })
+        }
         this.total = response.total
 
         setTimeout(() => {
